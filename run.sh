@@ -1,8 +1,6 @@
 #!/bin/bash 
 
-rm -r /tmp/dnsmasq_docker_tmp
-mkdir /tmp/dnsmasq_docker_tmp
-cp scripts/* /tmp/dnsmasq_docker_tmp/
+docker build --tag='dnsmasq_server' .
 
 sudo docker-compose down
 sudo docker-compose up

@@ -4,7 +4,7 @@ services:
   dnsmasq:
     cap_add: 
       - ALL
-    image: ubuntu:18.04
+    image: dnsmasq_server
     hostname: server
     container_name: dnsmasq
     privileged: true
@@ -12,46 +12,56 @@ services:
       - /lib/modules/:/lib/modules/
       - /usr/src:/usr/src
       - ./scripts/resolutions:/resolutions
-      - ./scripts/entrypoint-dnsmasq.sh:/entrypoint-dnsmasq.sh
-    command: ['cd / && ./entrypoint-dnsmasq.sh'] 
+      - ./scripts/entrypoint.sh:/entrypoint.sh
+    command: ['./entrypoint.sh'] 
+    entrypoint:
+      - /bin/bash
     networks:
       default:
-        ipv4_address: 172.15.0.5
+        ipv4_address: 172.30.0.5
     tty: true
 
-  # container1:
-  #   cap_add: 
-  #     - ALL
-  #   image: ubuntu:18.04
-  #   hostname: container1
-  #   container_name: container1
-  #   privileged: true
-  #   depends_on: 
-  #     - dnsmasq
-  #   command: ['bash /insert-ip.sh && tail -f /dev/null']
-  #   volumes:
-  #     - /tmp/dnsmasq_docker_tmp/insert-ip.sh:/insert-ip.sh
-  #   networks:
-  #     default:
-  #       ipv4_address: 172.15.0.6
-  #   tty: true
+  container1:
+    cap_add: 
+      - ALL
+    image: ubuntu:18.04
+    hostname: container1
+    container_name: container1
+    privileged: true
+    depends_on:
+      - dnsmasq
+    volumes:
+      - ./scripts/insertip.sh:/insertip.sh
+    dns:
+      - 172.30.0.5
+    # command: ['./insertip.sh']
+    entrypoint:
+      - /bin/bash
+    networks:
+        default:
+          ipv4_address: 172.30.0.6
+    tty: true
 
-  # container2:
-  #   cap_add: 
-  #     - ALL
-  #   image: ubuntu:18.04
-  #   hostname: container2
-  #   container_name: container2
-  #   privileged: true
-  #   depends_on:
-  #     - dnsmasq
-  #   command: ['bash /insert-ip.sh && tail -f /dev/null']
-  #   volumes:
-  #     - /tmp/dnsmasq_docker_tmp/insert-ip.sh:/insert-ip.sh
-  #   networks:
-  #       default:
-  #         ipv4_address: 172.15.0.7
-  #   tty: true
+  container2:
+    cap_add: 
+      - ALL
+    image: ubuntu:18.04
+    hostname: container2
+    container_name: container2
+    privileged: true
+    depends_on:
+      - dnsmasq
+    volumes:
+      - ./scripts/insertip.sh:/insertip.sh
+    # command: ['./insertip.sh']
+    dns:
+      - 172.30.0.5
+    entrypoint:
+      - /bin/bash
+    networks:
+        default:
+          ipv4_address: 172.30.0.7
+    tty: true
 
 networks:
   default:
@@ -59,5 +69,5 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.15.0.0/16
-          gateway: 172.15.0.1
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1
