@@ -11,6 +11,7 @@ services:
     volumes:
       - /lib/modules/:/lib/modules/
       - /usr/src:/usr/src
+      - ./conf/dnsmasq.conf:/etc/dnsmasq.conf
       - ./scripts/resolutions:/resolutions
       - ./scripts/entrypoint.sh:/entrypoint.sh
     command: ['./entrypoint.sh'] 
@@ -34,7 +35,7 @@ services:
       - ./scripts/insertip.sh:/insertip.sh
     dns:
       - 172.30.0.5
-    # command: ['./insertip.sh']
+    command: ['./insertip.sh']
     entrypoint:
       - /bin/bash
     networks:
@@ -53,7 +54,7 @@ services:
       - dnsmasq
     volumes:
       - ./scripts/insertip.sh:/insertip.sh
-    # command: ['./insertip.sh']
+    command: ['./insertip.sh']
     dns:
       - 172.30.0.5
     entrypoint:
