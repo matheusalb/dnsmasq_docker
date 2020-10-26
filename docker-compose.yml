@@ -1,0 +1,63 @@
+version: "2"
+
+services:
+  dnsmasq:
+    cap_add: 
+      - ALL
+    image: ubuntu:18.04
+    hostname: server
+    container_name: dnsmasq
+    privileged: true
+    volumes:
+      - /lib/modules/:/lib/modules/
+      - /usr/src:/usr/src
+      - ./scripts/resolutions:/resolutions
+      - ./scripts/entrypoint-dnsmasq.sh:/entrypoint-dnsmasq.sh
+    command: ['cd / && ./entrypoint-dnsmasq.sh'] 
+    networks:
+      default:
+        ipv4_address: 172.15.0.5
+    tty: true
+
+  # container1:
+  #   cap_add: 
+  #     - ALL
+  #   image: ubuntu:18.04
+  #   hostname: container1
+  #   container_name: container1
+  #   privileged: true
+  #   depends_on: 
+  #     - dnsmasq
+  #   command: ['bash /insert-ip.sh && tail -f /dev/null']
+  #   volumes:
+  #     - /tmp/dnsmasq_docker_tmp/insert-ip.sh:/insert-ip.sh
+  #   networks:
+  #     default:
+  #       ipv4_address: 172.15.0.6
+  #   tty: true
+
+  # container2:
+  #   cap_add: 
+  #     - ALL
+  #   image: ubuntu:18.04
+  #   hostname: container2
+  #   container_name: container2
+  #   privileged: true
+  #   depends_on:
+  #     - dnsmasq
+  #   command: ['bash /insert-ip.sh && tail -f /dev/null']
+  #   volumes:
+  #     - /tmp/dnsmasq_docker_tmp/insert-ip.sh:/insert-ip.sh
+  #   networks:
+  #       default:
+  #         ipv4_address: 172.15.0.7
+  #   tty: true
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.15.0.0/16
+          gateway: 172.15.0.1
